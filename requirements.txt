@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+torch
+torch-geometric
+osmnx
+networkx
+geopandas
+numpy
+pydantic
+matplotlib # Still needed by OSMnx even if not plotting
+# Add any other specific dependencies you might have used
