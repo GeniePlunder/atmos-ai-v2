@@ -13,22 +13,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
-# Use --no-cache-dir to reduce image size
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+# Add a meaningless argument to potentially break cache
+RUN pip install --no-cache-dir -r requirements.txt --cache-dir /tmp/pip-cache-bust
+
+# --- Debugging Step ---
+# List contents of /app before copying application code
+RUN echo "--- Contents of /app before copying code: ---" && ls -la /app && echo "--------------------------------------------"
+# --- End Debugging Step ---
 
 # Copy the rest of your application code into the container
-# Make sure gnn_model.pth and the data folder are included
 COPY ./main.py .
-COPY ./train_model.py . # Or 3_train_model.py (needed for GNN class definition)
+COPY ./train_model.py . # This is the line that was failing
 COPY ./gnn_model.pth .
 COPY ./data ./data
 
-# Make port 8000 available to the world outside this container
+# Make port 8000 available
 EXPOSE 8000
 
-# Define environment variable (optional, can be set during deployment)
-# ENV NAME World
-
-# Run main.py when the container launches using Uvicorn
+# Run main.py when the container launches
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
